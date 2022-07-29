@@ -32,14 +32,45 @@ function App() {
     }
   }
 
+  class IPCollector extends React.Component{
+
+    state = {
+      loading:true,
+      address: null,
+    }
+
+    componentDidMount(){
+
+      if(this.props.ip=="ipv4"){
+        fetch('https://api.ipify.org?format=json')
+        .then(response=>response.json())
+        .then((data)=>{
+          this.setState({address:data.ip,loading:false})
+        })
+      }else if(this.props.ip=="ipv6"){
+        fetch('https://api64.ipify.org?format=json')
+        .then(results=>results.json())
+        .then((data)=>{
+          this.setState({address:data.ip,loading:false})
+        })
+      }
+    }
+
+    render(){
+      return(
+        <div>
+          {this.state.loading||!this.state.address?<div>loading...</div>:<Exhibit heading = {this.props.ip} ><div>{this.state.address}</div></Exhibit>}
+        </div>
+      )
+    }
+  }
 
   return (
     <div>
       <Banner title="Sextant"/>
       <div className = "wrapper">
-        <Exhibit heading="Example exhibit">
-          <p>This is an example exhibit card.</p>
-        </Exhibit>
+        <IPCollector ip="ipv4"/>
+        <IPCollector ip ="ipv6"/>
       </div>
     </div>
   );

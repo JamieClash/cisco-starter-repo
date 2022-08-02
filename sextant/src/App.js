@@ -1,6 +1,10 @@
 import { getQueriesForElement } from '@testing-library/react';
 import React from 'react';
 import './App.css';
+import {w3cwebsocket as W3CWebSocket} from "websocket";
+import { getActiveElement } from '@testing-library/user-event/dist/utils';
+
+const client = new W3CWebSocket('ws://localhost:55455');
 
 function App() {
   class Banner extends React.Component{
@@ -29,6 +33,27 @@ function App() {
           </div>
         </div>
       );
+    }
+  }
+
+  class PacketLatency extends React.Component{
+    state = {
+      latency:0,
+      loading : true,
+    }
+
+    componentWillMount(){
+      client.onmessage = (message) => {
+        this.setState({latency:new Date().getTime()-message.data,loading:false})
+      };
+    }
+
+    render(){
+      return(
+        <div>
+          {this.state.loading?<div>loading latency...</div>:<Exhibit heading = "Packet Latency"><div>{this.state.latency}</div></Exhibit>}
+        </div>
+      )
     }
   }
 
@@ -71,6 +96,7 @@ function App() {
       <div className = "wrapper">
         <IPCollector ip="ipv4"/>
         <IPCollector ip ="ipv6"/>
+        <PacketLatency/>
       </div>
     </div>
   );
